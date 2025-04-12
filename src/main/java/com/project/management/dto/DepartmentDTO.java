@@ -15,6 +15,7 @@ public class DepartmentDTO {
     private String departmentName;
     private String code;
     private String description;
+    private List<String> courses;
     private List<String> studentNames;
     private List<String> teacherNames;
 }

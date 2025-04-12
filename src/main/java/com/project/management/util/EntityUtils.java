@@ -94,23 +94,26 @@ public class EntityUtils {
     public static DepartmentDTO toDepartmentDTO(Department department){
         List<String> students = department.getStudents().stream().map(Student::getName).collect(Collectors.toList());
         List<String> teachers = department.getTeachers().stream().map(Teacher::getName).collect(Collectors.toList());
+        List<String> courses = department.getCourses().stream().map(Course::getName).collect(Collectors.toList());
         return new DepartmentDTO(
             department.getId(),
             department.getDepartmentName(),
             department.getCode(),
             department.getDescription(),
+            courses,
             students,
             teachers
         );
     }
-    
-    public static Department toDepartment(DepartmentDTO departmentDTO,Course course, List<Student> students, List<Teacher> teachers){
+    public static Department toDepartment(DepartmentDTO departmentDTO,List<Course> courses, List<Student> students, List<Teacher> teachers){
         Department department = new Department();
         department.setId(departmentDTO.getId());
         department.setDepartmentName(departmentDTO.getDepartmentName());
         department.setCode(departmentDTO.getCode());
         department.setDepartmentName(departmentDTO.getDescription());
-        
+        department.setCourses(courses);
+        department.setStudents(students);
+        department.setTeachers(teachers);
         return department;
     }
 
