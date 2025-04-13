@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -34,10 +35,11 @@ public class Teacher {
     private Gender gender;
 
     @ManyToOne
-    @JoinColumn( name = "department_id" )
+    @JoinColumn(name = "department_id")
     private Department department;
 
     @ManyToMany
-    @JoinColumn( name = "teacher_course" )
+    @JoinTable(name = "teacher_course", joinColumns = @JoinColumn(name = "teacher_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
     private List<Course> courses;
+
 }
