@@ -11,17 +11,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.project.management.dto.CourseDTO;
 import com.project.management.service.CourseService;
 
+import lombok.RequiredArgsConstructor;
+
+@RestController
 @RequestMapping("/api/course")
+@RequiredArgsConstructor
 public class CourseController {
 
     @Autowired
     private CourseService courseService;
 
-     @PostMapping("/create")
+    @PostMapping("/create")
     public ResponseEntity<CourseDTO> create(@RequestBody CourseDTO courseDTO) {
         return ResponseEntity.ok(courseService.create(courseDTO));
     }
