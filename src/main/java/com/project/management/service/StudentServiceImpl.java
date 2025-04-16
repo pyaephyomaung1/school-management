@@ -18,68 +18,73 @@ import com.project.management.util.EntityUtils;
 @Service
 public class StudentServiceImpl implements StudentService {
 
-    @Autowired
-    private StudentRepository studentRepository;
+        @Autowired
+        private StudentRepository studentRepository;
 
-    @Autowired
-    private DepartmentRepository departmentRepository;
+        @Autowired
+        private DepartmentRepository departmentRepository;
 
-    @Autowired
-    private CourseRepository courseRepository;
+        @Autowired
+        private CourseRepository courseRepository;
 
-    @Override
-    public StudentDTO create(StudentDTO studentDTO) {
-        Department department = departmentRepository.findByDepartmentName(studentDTO.getDepartmentName())
-                .orElseThrow(() -> new RuntimeException("Department not found"));
+        @Override
+        public StudentDTO create(StudentDTO studentDTO) {
+                Department department = departmentRepository.findByDepartmentName(studentDTO.getDepartmentName())
+                                .orElseThrow(() -> new RuntimeException("Department not found"));
 
-        List<Course> courses = courseRepository.findAll().stream()
-                .filter(course -> studentDTO.getCourseNames().contains(course.getName()))
-                .collect(Collectors.toList());
+                List<Course> courses = courseRepository.findAll().stream()
+                                .filter(course -> studentDTO.getCourseNames().contains(course.getName()))
+                                .collect(Collectors.toList());
 
-        Student student = EntityUtils.toStudent(studentDTO, department, courses);
-        return EntityUtils.toStudentDTO(studentRepository.save(student));
-    }
+                Student student = EntityUtils.toStudent(studentDTO, department, courses);
+                return EntityUtils.toStudentDTO(studentRepository.save(student));
+        }
 
-    @Override
-    public StudentDTO update(StudentDTO studentDTO) {
-        Student student = studentRepository.findById(studentDTO.getId())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+        @Override
+        public StudentDTO update(StudentDTO studentDTO) {
+                Student existingStudent = studentRepository.findById(studentDTO.getId())
+                                .orElseThrow(() -> new RuntimeException("Student not found"));
 
-        Department department = departmentRepository.findByDepartmentName(studentDTO.getDepartmentName())
-                .orElseThrow(() -> new RuntimeException("Department not found"));
+                Department department = departmentRepository.findByDepartmentName(studentDTO.getDepartmentName())
+                                .orElseThrow(() -> new RuntimeException("Department not found"));
 
-        List<Course> courses = courseRepository.findAll().stream()
-                .filter(course -> studentDTO.getCourseNames().contains(course.getName()))
-                .collect(Collectors.toList());
+                List<Course> courses = courseRepository.findAll().stream()
+                                .filter(c -> studentDTO.getCourseNames().contains(c.getName()))
+                                .collect(Collectors.toList());
 
-        student.setName(studentDTO.getName());
-        student.setEmail(studentDTO.getEmail());
-        student.setBirthDate(studentDTO.getBirthDate());
-        student.setGender(studentDTO.getGender());
-        student.setStudentImage(studentDTO.getStudentImage());
-        student.setDepartment(department);
-        student.setCourses(courses);
+                existingStudent.setName(studentDTO.getName());
+                existingStudent.setBirthDate(studentDTO.getBirthDate());
+                existingStudent.setGender(studentDTO.getGender());
+                existingStudent.setEmail(studentDTO.getEmail());
+                existingStudent.setDepartment(department);
+                existingStudent.setCourses(courses);
 
-        return EntityUtils.toStudentDTO(studentRepository.save(student));
-    }
+                if (studentDTO.getStudentImage() != null && !studentDTO.getStudentImage().isBlank()) {
+                        existingStudent.setStudentImage(studentDTO.getStudentImage());
+                }
 
-    @Override
-    public StudentDTO getById(int id) {
-        return studentRepository.findById(id)
-                .map(EntityUtils::toStudentDTO)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-    }
+                Student updatedStudent = studentRepository.save(existingStudent);
+                return EntityUtils.toStudentDTO(updatedStudent);
+        }
+        
 
-    @Override
-    public List<StudentDTO> getAll() {
-        return studentRepository.findAll()
-                .stream()
-                .map(EntityUtils::toStudentDTO)
-                .collect(Collectors.toList());
-    }
+        @Override
+        public StudentDTO getById(int id) {
+                return studentRepository.findById(id)
+                                .map(EntityUtils::toStudentDTO)
+                                .orElseThrow(() -> new RuntimeException("Student not found"));
+        }
 
-    @Override
-    public void deleteById(int id) {
-        studentRepository.deleteById(id);
-    }
+        @Override
+        public List<StudentDTO> getAll() {
+                return studentRepository.findAll()
+                                .stream()
+                                .map(EntityUtils::toStudentDTO)
+                                .collect(Collectors.toList());
+        }
+
+        @Override
+        public void deleteById(int id) {
+                studentRepository.deleteById(id);
+        }
 }
