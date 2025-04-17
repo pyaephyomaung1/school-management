@@ -19,6 +19,6 @@ public class StudentDTO {
     private Gender gender;
     private String email;
     private String studentImage;
-    private String departmentName;
-    private List<String> courseNames;
+    private int department;
+    private List<Integer> courses;
 }

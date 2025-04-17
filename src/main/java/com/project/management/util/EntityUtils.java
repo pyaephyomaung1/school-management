@@ -14,7 +14,11 @@ import com.project.management.model.Teacher;
 
 public class EntityUtils {
     public static StudentDTO toStudentDTO(Student student) {
-        List<String> courses = student.getCourses().stream().map(Course::getName).collect(Collectors.toList());
+        List<Integer> courseIds = student.getCourses()
+                .stream()
+                .map(Course::getId)
+                .collect(Collectors.toList());
+
         return new StudentDTO(
                 student.getId(),
                 student.getName(),
@@ -22,8 +26,9 @@ public class EntityUtils {
                 student.getGender(),
                 student.getEmail(),
                 student.getStudentImage(),
-                student.getDepartment().getDepartmentName(),
-                courses);
+                student.getDepartment().getId(),
+                courseIds);
+
     }
 
     public static Student toStudent(StudentDTO student, Department department, List<Course> courses) {
@@ -39,9 +44,9 @@ public class EntityUtils {
     }
 
     public static TeacherDTO toTeacherDTO(Teacher teacher) {
-        List<String> courses = teacher.getCourses()
+        List<Integer> courses = teacher.getCourses()
                 .stream()
-                .map(Course::getName)
+                .map(Course::getId)
                 .collect(Collectors.toList());
 
         return new TeacherDTO(
@@ -51,7 +56,7 @@ public class EntityUtils {
                 teacher.getBirthDate(),
                 teacher.getGender(),
                 teacher.getTeacherImage(),
-                teacher.getDepartment().getDepartmentName(),
+                teacher.getDepartment().getId(),
                 courses);
     }
 
@@ -91,26 +96,27 @@ public class EntityUtils {
         return course;
     }
 
-    public static DepartmentDTO toDepartmentDTO(Department department){
+    public static DepartmentDTO toDepartmentDTO(Department department) {
         List<String> students = department.getStudents().stream().map(Student::getName).collect(Collectors.toList());
         List<String> teachers = department.getTeachers().stream().map(Teacher::getName).collect(Collectors.toList());
         List<String> courses = department.getCourses().stream().map(Course::getName).collect(Collectors.toList());
         return new DepartmentDTO(
-            department.getId(),
-            department.getDepartmentName(),
-            department.getCode(),
-            department.getDescription(),
-            courses,
-            students,
-            teachers
-        );
+                department.getId(),
+                department.getDepartmentName(),
+                department.getCode(),
+                department.getDescription(),
+                courses,
+                students,
+                teachers);
     }
-    public static Department toDepartment(DepartmentDTO departmentDTO,List<Course> courses, List<Student> students, List<Teacher> teachers){
+
+    public static Department toDepartment(DepartmentDTO departmentDTO, List<Course> courses, List<Student> students,
+            List<Teacher> teachers) {
         Department department = new Department();
         department.setId(departmentDTO.getId());
         department.setDepartmentName(departmentDTO.getDepartmentName());
         department.setCode(departmentDTO.getCode());
-        department.setDepartmentName(departmentDTO.getDescription());
+        department.setDescription(departmentDTO.getDescription());
         department.setCourses(courses);
         department.setStudents(students);
         department.setTeachers(teachers);

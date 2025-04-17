@@ -29,12 +29,11 @@ public class StudentServiceImpl implements StudentService {
 
         @Override
         public StudentDTO create(StudentDTO studentDTO) {
-                Department department = departmentRepository.findByDepartmentName(studentDTO.getDepartmentName())
+                Department department = departmentRepository.findById(studentDTO.getDepartment())
                                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
-                List<Course> courses = courseRepository.findAll().stream()
-                                .filter(course -> studentDTO.getCourseNames().contains(course.getName()))
-                                .collect(Collectors.toList());
+                List<Course> courses = courseRepository.findAllById(studentDTO.getCourses());
+
 
                 Student student = EntityUtils.toStudent(studentDTO, department, courses);
                 return EntityUtils.toStudentDTO(studentRepository.save(student));
@@ -45,12 +44,10 @@ public class StudentServiceImpl implements StudentService {
                 Student existingStudent = studentRepository.findById(studentDTO.getId())
                                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
-                Department department = departmentRepository.findByDepartmentName(studentDTO.getDepartmentName())
+                Department department = departmentRepository.findById(studentDTO.getDepartment())
                                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
-                List<Course> courses = courseRepository.findAll().stream()
-                                .filter(c -> studentDTO.getCourseNames().contains(c.getName()))
-                                .collect(Collectors.toList());
+                List<Course> courses = courseRepository.findAllById(studentDTO.getCourses());
 
                 existingStudent.setName(studentDTO.getName());
                 existingStudent.setBirthDate(studentDTO.getBirthDate());
@@ -66,7 +63,6 @@ public class StudentServiceImpl implements StudentService {
                 Student updatedStudent = studentRepository.save(existingStudent);
                 return EntityUtils.toStudentDTO(updatedStudent);
         }
-        
 
         @Override
         public StudentDTO getById(int id) {

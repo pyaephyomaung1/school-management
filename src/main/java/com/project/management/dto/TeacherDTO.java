@@ -19,6 +19,6 @@ public class TeacherDTO {
     private LocalDate birthDate;
     private Gender gender;
     private String teacherImage;
-    private String departmentName;
-    private List<String> courseNames;
+    private int department;
+    private List<Integer> courses;
 }
