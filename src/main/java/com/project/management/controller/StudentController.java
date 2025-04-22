@@ -1,14 +1,8 @@
 package com.project.management.controller;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
@@ -44,6 +38,9 @@ public class StudentController {
     private StudentService studentService;
 
     @Autowired
+    private ImageStore imageStore;
+
+    @Autowired
     private StudentRepository studentRepository;
 
     @Autowired
@@ -69,7 +66,7 @@ public class StudentController {
         dto.setDepartment(department);
         dto.setCourses(courses);
 
-        String imageName = saveImage(image);
+        String imageName = imageStore.saveImage(image);
         dto.setStudentImage(imageName);
 
         return ResponseEntity.ok(studentService.create(dto));
@@ -112,7 +109,7 @@ public class StudentController {
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
-            String imageName = saveImage(imageFile);
+            String imageName = imageStore.saveImage(imageFile);
             existingStudent.setStudentImage(imageName);
         }
 
@@ -136,16 +133,5 @@ public class StudentController {
         return ResponseEntity.noContent().build();
     }
 
-    private String saveImage(MultipartFile file) throws IOException {
-        String uploadDir = "uploads/";
-        File dir = new File(uploadDir);
-        if (!dir.exists())
-            dir.mkdirs();
-
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(uploadDir, fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        return fileName;
-    }
+    
 }
