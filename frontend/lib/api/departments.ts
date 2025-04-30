@@ -15,3 +15,8 @@ export const createDepartment = async (newDepartment: {
     const response = await api.post<Department>('/department/create', newDepartment);
     return response.data;
   };
+
+export const deleteDepartment = async (id : number ) => {
+  const response = await api.delete('/department/{id}');
+  return response.data;
+};
