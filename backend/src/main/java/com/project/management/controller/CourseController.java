@@ -31,8 +31,9 @@ public class CourseController {
         return ResponseEntity.ok(courseService.create(courseDTO));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<CourseDTO> update(@RequestBody CourseDTO courseDTO) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<CourseDTO> update(@PathVariable int id,@RequestBody CourseDTO courseDTO) {
+        courseDTO.setId(id);
         return ResponseEntity.ok(courseService.update(courseDTO));
     }
 

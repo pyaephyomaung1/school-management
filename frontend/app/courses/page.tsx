@@ -1,11 +1,21 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Course } from "@/types/course";
-import { getCourses } from "@/lib/api/courses";
+import { deleteCourse, getCourses } from "@/lib/api/courses";
+import { useRouter } from "next/navigation";
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  const handleAddCourse = () => {
+    router.push("/courses/create");
+  };
+
+  const handleEditCourse = (id: number) => {
+    router.push(`/courses/edit/${id}`); // Assuming you have an edit page
+  };
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -13,7 +23,7 @@ const CoursesPage = () => {
         const data = await getCourses();
         setCourses(data);
       } catch (error) {
-        console.error("Failed to load departments:", error);
+        console.error("Failed to load courses:", error); // Corrected typo here too
       } finally {
         setLoading(false);
       }
@@ -22,19 +32,57 @@ const CoursesPage = () => {
     loadCourses();
   }, []);
 
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this course?")) {
+      try {
+        await deleteCourse(id);
+        setCourses(courses.filter((course) => course.id !== id));
+        // Optional: Show a success message here
+      } catch (error) {
+        console.error("Failed to delete course:", error);
+        // Optional: Show an error message to the user
+      }
+    }
+  };
+
   if (loading)
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-800 p-6">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mb-4"></div>
-        <p className="text-lg font-semibold animate-pulse">
-          Loading departments...
-        </p>
+        <p className="text-lg font-semibold animate-pulse">Loading courses...</p>
       </div>
     );
 
   return (
     <div className="p-6 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Courses</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Courses</h1>
+          <p className="text-gray-500 mt-1">
+            {courses.length} course{courses.length !== 1 ? "s" : ""}{" "}
+            found
+          </p>
+        </div>
+        <button
+          onClick={handleAddCourse}
+          type="button"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium shadow-sm hover:shadow-md transition-all duration-200 hover:from-blue-700 hover:to-blue-600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Add Course
+        </button>
+      </div>
 
       <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-gray-200">
         <table className="w-full text-left border-collapse">
@@ -59,11 +107,17 @@ const CoursesPage = () => {
                 <td className="p-4 text-gray-800">{course.name}</td>
                 <td className="p-4 text-gray-800">{course.description}</td>
                 <td className="p-4 text-gray-800">{course.departmentName}</td>
-                <td className="p-4 text-gray-800 gap-4 flex">
-                  <button className="text-blue-600 hover:text-blue-800">
+                <td className="p-4 text-gray-800 gap-2 flex">
+                  <button
+                    onClick={() => handleEditCourse(course.id)} // Added onClick for Edit
+                    className="text-gray-200 px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 hover:text-gray-100 transition-colors duration-200 text-sm"
+                  >
                     Edit
                   </button>
-                  <button className="ml-2 text-red-600 hover:text-red-800">
+                  <button
+                    onClick={() => handleDelete(course.id)}
+                    className="ml-2 text-gray-100 bg-red-600 px-3 py-1 rounded hover:bg-red-700 hover:text-gray-200 transition-colors duration-200 text-sm"
+                  >
                     Delete
                   </button>
                 </td>

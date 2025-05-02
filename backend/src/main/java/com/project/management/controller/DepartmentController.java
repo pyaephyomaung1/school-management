@@ -30,8 +30,9 @@ public class DepartmentController {
         return ResponseEntity.ok(departmentService.create(department));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<DepartmentDTO> update(@RequestBody DepartmentDTO dto) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity<DepartmentDTO> update( @PathVariable int id , @RequestBody DepartmentDTO dto) {
+        dto.setId(id);
         return ResponseEntity.ok(departmentService.update(dto));
     }
 

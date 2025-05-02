@@ -27,7 +27,11 @@ const DepartmentsPage = () => {
 
   const handleAddDepartment = () => {
     router.push("/departments/create");
-  }
+  };
+
+  const handleUpdateDepartment = (id: number) => {
+    router.push(`/departments/update?id=${id}`);
+  };
 
   const handleDeleteDepartment = async (id: number) => {
     if (confirm("Are you sure you want to delete this department?")) {
@@ -38,7 +42,7 @@ const DepartmentsPage = () => {
         console.error("Failed to delete department:", error);
       }
     }
-  }
+  };
   if (loading)
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-800 p-6">
@@ -59,7 +63,11 @@ const DepartmentsPage = () => {
             found
           </p>
         </div>
-        <button onClick={handleAddDepartment} type="button" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium shadow-sm hover:shadow-md transition-all duration-200 hover:from-blue-700 hover:to-blue-600">
+        <button
+          onClick={handleAddDepartment}
+          type="button"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium shadow-sm hover:shadow-md transition-all duration-200 hover:from-blue-700 hover:to-blue-600"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
@@ -99,11 +107,17 @@ const DepartmentsPage = () => {
                 <td className="p-4 text-gray-800">{dept.departmentName}</td>
                 <td className="p-4 text-gray-800">{dept.code}</td>
                 <td className="p-4 text-gray-800">{dept.description}</td>
-                <td className="p-4 text-gray-800 gap-4 flex">
-                  <button className="text-blue-600 hover:text-blue-800">
+                <td className="p-4 text-gray-800 gap-1 flex">
+                  <button
+                    className="text-gray-200 px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 hover:text-gray-100 transition-colors duration-200 text-sm"
+                    onClick={() => handleUpdateDepartment(dept.id)}
+                  >
                     Edit
                   </button>
-                  <button className="ml-2 text-red-600 hover:text-red-800" onClick={() => handleDeleteDepartment(dept.id)}>
+                  <button
+                    className="ml-2 text-gray-100 bg-red-600 px-3 py-1 rounded hover:bg-red-700 hover:text-gray-200 transition-colors duration-200 text-sm"
+                    onClick={() => handleDeleteDepartment(dept.id)}
+                  >
                     Delete
                   </button>
                 </td>
