@@ -33,7 +33,7 @@ public class TeacherServiceImpl implements TeacherService {
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
         List<Course> courses = courseRepository.findAllById(teacherDTO.getCourses());
-        Teacher teacher = EntityUtils.toTeahcer(teacherDTO, department, courses);
+        Teacher teacher = EntityUtils.toTeacher(teacherDTO, department, courses);
         return EntityUtils.toTeacherDTO(teacherRepository.save(teacher));
     }
 

@@ -24,7 +24,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseDTO create(CourseDTO courseDTO) {
-        Department department = departmentRepository.findByDepartmentName(courseDTO.getDepartmentName())
+        Department department = departmentRepository.findById(courseDTO.getDepartmentId())
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
         Course course = new Course();
@@ -44,7 +44,7 @@ public class CourseServiceImpl implements CourseService {
         existing.setName(courseDTO.getName());
         existing.setDescription(courseDTO.getDescription());
 
-        Department department = departmentRepository.findByDepartmentName(courseDTO.getDepartmentName())
+        Department department = departmentRepository.findById(courseDTO.getDepartmentId())
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
         existing.setDepartment(department);

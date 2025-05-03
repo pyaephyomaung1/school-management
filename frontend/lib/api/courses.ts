@@ -12,10 +12,11 @@ export const deleteCourse = async (id : number) => {
     return response.data;
 }
 
-export const createCourse = async (newCourse : {
-    name : string;
-    description : string;
-
-}) => {
-
-}
+export const createCourse = async (newCourse: {
+    name: string;
+    description: string;
+    departmentId: number;
+  }) => {
+    const response = await api.post<Course>("/course/create", newCourse);
+    return response.data;
+  };

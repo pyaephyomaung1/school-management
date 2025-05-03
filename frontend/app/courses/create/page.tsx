@@ -6,25 +6,43 @@ import { getDepartments } from "@/lib/api/departments";
 import { createCourse } from "@/lib/api/courses";
 import { toast } from "sonner";
 
+// Define consistent Department type
+interface Department {
+  id: number;
+  name: string;
+}
+
+interface CourseForm {
+  name: string;
+  description: string;
+  departmentId: string; // stays string for form select
+}
+
 const CreateCoursePage = () => {
   const router = useRouter();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<CourseForm>({
     name: "",
     description: "",
-    departmentName: "",
+    departmentId: "",
   });
 
-  const [departments, setDepartments] = useState<string[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch departments when page loads
+  // Load departments
   useEffect(() => {
     const loadDepartments = async () => {
       try {
         const data = await getDepartments();
-        const names = data.map((dept: any) => dept.departmentName);
-        setDepartments(names);
+
+        // Map to consistent Department type
+        const mapped: Department[] = data.map((dept: any) => ({
+          id: dept.id,
+          name: dept.departmentName,
+        }));
+
+        setDepartments(mapped);
       } catch (error) {
         console.error("Failed to load departments", error);
         toast.error("Failed to load departments");
@@ -34,7 +52,9 @@ const CreateCoursePage = () => {
     loadDepartments();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
@@ -44,14 +64,18 @@ const CreateCoursePage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.name || !form.departmentName) {
+    if (!form.name || !form.departmentId) {
       toast.error("Name and Department are required");
       return;
     }
 
     setLoading(true);
     try {
-      await createCourse(form);
+      await createCourse({
+        name: form.name,
+        description: form.description,
+        departmentId: Number(form.departmentId), // send as number
+      });
       toast.success("Course created successfully!");
       setTimeout(() => {
         router.push("/courses");
@@ -71,7 +95,9 @@ const CreateCoursePage = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Name */}
         <div>
-          <label className="block text-gray-700" htmlFor="name">Name</label>
+          <label className="block text-gray-700" htmlFor="name">
+            Name
+          </label>
           <input
             type="text"
             name="name"
@@ -84,7 +110,9 @@ const CreateCoursePage = () => {
 
         {/* Description */}
         <div>
-          <label className="block text-gray-700" htmlFor="description">Description</label>
+          <label className="block text-gray-700" htmlFor="description">
+            Description
+          </label>
           <textarea
             name="description"
             value={form.description}
@@ -96,17 +124,21 @@ const CreateCoursePage = () => {
 
         {/* Department Selection */}
         <div>
-          <label className="block text-gray-700" htmlFor="departmentName">Department</label>
+          <label className="block text-gray-700" htmlFor="departmentId">
+            Department
+          </label>
           <select
-            name="departmentName"
-            value={form.departmentName}
+            name="departmentId"
+            value={form.departmentId}
             onChange={handleChange}
             className="mt-1 w-full border rounded p-2 text-gray-800"
             required
           >
             <option value="">Select a department</option>
             {departments.map((dept) => (
-              <option key={dept} value={dept}>{dept}</option>
+              <option key={dept.id} value={dept.id}>
+                {dept.name}
+              </option>
             ))}
           </select>
         </div>

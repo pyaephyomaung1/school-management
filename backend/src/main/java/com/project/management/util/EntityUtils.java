@@ -1,5 +1,6 @@
 package com.project.management.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,9 @@ import com.project.management.model.Student;
 import com.project.management.model.Teacher;
 
 public class EntityUtils {
+
     public static StudentDTO toStudentDTO(Student student) {
-        List<Integer> courseIds = student.getCourses()
+        List<Integer> courseIds = safeList(student.getCourses())
                 .stream()
                 .map(Course::getId)
                 .collect(Collectors.toList());
@@ -28,7 +30,6 @@ public class EntityUtils {
                 student.getStudentImage(),
                 student.getDepartment().getId(),
                 courseIds);
-
     }
 
     public static Student toStudent(StudentDTO student, Department department, List<Course> courses) {
@@ -44,7 +45,7 @@ public class EntityUtils {
     }
 
     public static TeacherDTO toTeacherDTO(Teacher teacher) {
-        List<Integer> courses = teacher.getCourses()
+        List<Integer> courseIds = safeList(teacher.getCourses())
                 .stream()
                 .map(Course::getId)
                 .collect(Collectors.toList());
@@ -57,10 +58,10 @@ public class EntityUtils {
                 teacher.getGender(),
                 teacher.getTeacherImage(),
                 teacher.getDepartment().getId(),
-                courses);
+                courseIds);
     }
 
-    public static Teacher toTeahcer(TeacherDTO teacher, Department department, List<Course> courses) {
+    public static Teacher toTeacher(TeacherDTO teacher, Department department, List<Course> courses) {
         return new Teacher(
                 teacher.getId(),
                 teacher.getName(),
@@ -73,19 +74,26 @@ public class EntityUtils {
     }
 
     public static CourseDTO toCourseDTO(Course course) {
-        List<String> students = course.getStudents().stream().map(Student::getName).collect(Collectors.toList());
-        List<String> teachers = course.getTeachers().stream().map(Teacher::getName).collect(Collectors.toList());
+        List<String> students = safeList(course.getStudents())
+                .stream()
+                .map(Student::getName)
+                .collect(Collectors.toList());
+
+        List<String> teachers = safeList(course.getTeachers())
+                .stream()
+                .map(Teacher::getName)
+                .collect(Collectors.toList());
+
         return new CourseDTO(
                 course.getId(),
                 course.getName(),
                 course.getDescription(),
-                course.getDepartment().getDepartmentName(),
+                course.getDepartment().getId(),
                 students,
                 teachers);
     }
 
-    public static Course toCourse(CourseDTO dto, Department department, List<Student> students,
-            List<Teacher> teachers) {
+    public static Course toCourse(CourseDTO dto, Department department, List<Student> students, List<Teacher> teachers) {
         Course course = new Course();
         course.setId(dto.getId());
         course.setName(dto.getName());
@@ -97,9 +105,21 @@ public class EntityUtils {
     }
 
     public static DepartmentDTO toDepartmentDTO(Department department) {
-        List<String> students = department.getStudents().stream().map(Student::getName).collect(Collectors.toList());
-        List<String> teachers = department.getTeachers().stream().map(Teacher::getName).collect(Collectors.toList());
-        List<String> courses = department.getCourses().stream().map(Course::getName).collect(Collectors.toList());
+        List<String> students = safeList(department.getStudents())
+                .stream()
+                .map(Student::getName)
+                .collect(Collectors.toList());
+
+        List<String> teachers = safeList(department.getTeachers())
+                .stream()
+                .map(Teacher::getName)
+                .collect(Collectors.toList());
+
+        List<String> courses = safeList(department.getCourses())
+                .stream()
+                .map(Course::getName)
+                .collect(Collectors.toList());
+
         return new DepartmentDTO(
                 department.getId(),
                 department.getDepartmentName(),
@@ -110,8 +130,7 @@ public class EntityUtils {
                 teachers);
     }
 
-    public static Department toDepartment(DepartmentDTO departmentDTO, List<Course> courses, List<Student> students,
-            List<Teacher> teachers) {
+    public static Department toDepartment(DepartmentDTO departmentDTO, List<Course> courses, List<Student> students, List<Teacher> teachers) {
         Department department = new Department();
         department.setId(departmentDTO.getId());
         department.setDepartmentName(departmentDTO.getDepartmentName());
@@ -123,4 +142,8 @@ public class EntityUtils {
         return department;
     }
 
+    // ✅ Null-safe utility for all lists
+    private static <T> List<T> safeList(List<T> list) {
+        return (list != null) ? list : new ArrayList<>();
+    }
 }
