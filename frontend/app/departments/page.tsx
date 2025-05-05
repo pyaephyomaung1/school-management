@@ -115,7 +115,8 @@ const DepartmentsPage = () => {
                     Edit
                   </button>
                   <button
-                    className="ml-2 text-gray-100 bg-red-600 px-3 py-1 rounded hover:bg-red-700 hover:text-gray-200 transition-colors duration-200 text-sm"
+                    className="ml-2 text-gray-100 bg-red-600 px-3 py-1 rounded hover:bg-red-700 hover:text-gray-200 transition-colors duration-200 text-sm
+                    "
                     onClick={() => handleDeleteDepartment(dept.id)}
                   >
                     Delete
