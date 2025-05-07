@@ -50,14 +50,14 @@ public class EntityUtils {
                 .stream()
                 .map(Course::getId)
                 .collect(Collectors.toList());
-
+        String imageUrl = "http://localhost:8080/images/" + teacher.getTeacherImage();
         return new TeacherDTO(
                 teacher.getId(),
                 teacher.getName(),
                 teacher.getEmail(),
                 teacher.getBirthDate(),
                 teacher.getGender(),
-                teacher.getTeacherImage(),
+                imageUrl,
                 teacher.getDepartment().getId(),
                 courseIds);
     }

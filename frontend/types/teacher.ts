@@ -3,6 +3,8 @@ export interface Teacher {
     name : string; 
     email : string;
     birthDate : string;
-    gender : string;
+    gender :  'MALE' | 'FEMALE' | 'OTHER';
     teacherImage  : string ; 
+    department: number;
+    courses : number[];
 }
