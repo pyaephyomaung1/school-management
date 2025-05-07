@@ -1,24 +1,27 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Course } from "@/types/course";
-import { deleteCourse, getCourses } from "@/lib/api/courses";
+import { getStudents, deleteStudent } from "@/lib/api/students";
 import { useRouter } from "next/navigation";
 import { getDepartments } from "@/lib/api/departments";
+import { getCourses } from "@/lib/api/courses";
 import { Department } from "@/types/department";
+import { Student } from "@/types/student";
 
-const CoursesPage = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
+const StudentsPage = () => {
+  const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
 
-  const handleAddCourse = () => {
-    router.push("/courses/create");
+  const handleAddStudent = () => {
+    router.push("/students/create");
   };
 
-  const handleEditCourse = (id: number) => {
-    router.push(`/courses/update/${id}`);
+  const handleEditStudent = (id: number) => {
+    router.push(`/students/update/${id}`);
   };
 
   // Function to get department name by ID
@@ -27,42 +30,43 @@ const CoursesPage = () => {
     return department ? department.departmentName : "-";
   };
 
-  useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        const data = await getCourses();
-        setCourses(data);
-      } catch (error) {
-        console.error("Failed to load courses:", error);
-        setError("Failed to load courses. Please try again later.");
-      }
-    };
+  // Function to get course name by ID
+  const getCourseName = (courseId: number) => {
+    const course = courses.find((c) => c.id === courseId);
+    return course ? course.name : "-";
+  };
 
-    const loadDepartments = async () => {
+  useEffect(() => {
+    const loadData = async () => {
       try {
-        const departmentData = await getDepartments();
-        setDepartments(departmentData);
+        const [studentsData, departmentsData, coursesData] = await Promise.all([
+          getStudents(),
+          getDepartments(),
+          getCourses(),
+        ]);
+        setStudents(studentsData);
+        setDepartments(departmentsData);
+        setCourses(coursesData);
       } catch (error) {
-        console.error("Failed to load departments:", error);
-        setError("Failed to load departments. Please try again later.");
+        console.error("Failed to load data:", error);
+        setError("Failed to load data. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
-    loadCourses();
-    loadDepartments();
+    loadData();
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this course?")) {
+    if (confirm("Are you sure you want to delete this student?")) {
       try {
-        await deleteCourse(id);
-        setCourses(courses.filter((course) => course.id !== id));
-        alert("Course deleted successfully");
+        await deleteStudent(id);
+        setStudents(students.filter((student) => student.id !== id));
+        alert("Student deleted successfully");
       } catch (error) {
-        console.error("Failed to delete course:", error);
-        alert("Failed to delete course. Please try again.");
+        console.error("Failed to delete student:", error);
+        alert("Failed to delete student. Please try again.");
       }
     }
   };
@@ -72,7 +76,7 @@ const CoursesPage = () => {
       <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-800 p-6">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mb-4"></div>
         <p className="text-lg font-semibold animate-pulse">
-          Loading courses...
+          Loading students...
         </p>
       </div>
     );
@@ -96,13 +100,13 @@ const CoursesPage = () => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Courses</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Students</h1>
           <p className="text-gray-500 mt-1">
-            {courses.length} course{courses.length !== 1 ? "s" : ""} found
+            {students.length} student{students.length !== 1 ? "s" : ""} found
           </p>
         </div>
         <button
-          onClick={handleAddCourse}
+          onClick={handleAddStudent}
           type="button"
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium shadow-sm hover:shadow-md transition-all duration-200 hover:from-blue-700 hover:to-blue-600"
         >
@@ -118,18 +122,18 @@ const CoursesPage = () => {
               clipRule="evenodd"
             />
           </svg>
-          Add Course
+          Add Student
         </button>
       </div>
 
-      {courses.length === 0 ? (
+      {students.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 text-center">
-          <p className="text-gray-500 mb-4">No courses found</p>
+          <p className="text-gray-500 mb-4">No students found</p>
           <button
-            onClick={handleAddCourse}
+            onClick={handleAddStudent}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            Create Your First Course
+            Create Your First Student
           </button>
         </div>
       ) : (
@@ -138,41 +142,61 @@ const CoursesPage = () => {
             <thead className="bg-gray-50">
               <tr className="text-gray-600 uppercase text-sm tracking-wider">
                 <th className="p-4 font-semibold">ID</th>
+                <th className="p-4 font-semibold">Image</th>
                 <th className="p-4 font-semibold">Name</th>
-                <th className="p-4 font-semibold">Description</th>
+                <th className="p-4 font-semibold">Birth Date</th>
+                <th className="p-4 font-semibold">Gender</th>
+                <th className="p-4 font-semibold">Email</th>
                 <th className="p-4 font-semibold">Department</th>
+                <th className="p-4 font-semibold">Courses</th>
                 <th className="p-4 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {courses.map((course, index) => (
+              {students.map((student, index) => (
                 <tr
-                  key={course.id}
+                  key={student.id}
                   className={`border-b ${
                     index % 2 === 0 ? "bg-white" : "bg-gray-50"
                   } hover:bg-blue-50 transition`}
                 >
-                  <td className="p-4 text-gray-800">{course.id}</td>
-                  <td className="p-4 text-gray-800">{course.name}</td>
+                  <td className="p-4 text-gray-800">{student.id}</td>
+                  <td className="p-4">
+                    {student.studentImage ? (
+                      <img
+                        src={student.studentImage}
+                        alt="Student"
+                        className="w-16 h-16 object-cover rounded-full"
+                      />
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="p-4 text-gray-800">{student.name}</td>
                   <td className="p-4 text-gray-800">
-                    {course.description || "-"}
+                    {student.birthDate || "-"}
+                  </td>
+                  <td className="p-4 text-gray-800">{student.gender || "-"}</td>
+                  <td className="p-4 text-gray-800">{student.email || "-"}</td>
+                  <td className="p-4 text-gray-800">
+                    {getDepartmentName(Number(student.department))}
                   </td>
                   <td className="p-4 text-gray-800">
-                    {getDepartmentName(Number(course.departmentId))}
+                    {student.courses?.map((courseId) => (
+                      <div key={courseId}>{getCourseName(courseId)}</div>
+                    )) || "-"}
                   </td>
                   <td className="p-4">
                     <div className="flex gap-2">
                       <button
                         type="button"
-                        onClick={() =>
-                          handleEditCourse(course.id) // Directly handle the edit action
-                        }
+                        onClick={() => handleEditStudent(student.id)}
                         className="text-gray-200 px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 hover:text-gray-100 transition-colors duration-200 text-sm"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(course.id)}
+                        onClick={() => handleDelete(student.id)}
                         className="text-gray-100 px-3 py-1 rounded bg-red-600 hover:bg-red-700 hover:text-gray-200 transition-colors duration-200 text-sm"
                       >
                         Delete
@@ -189,4 +213,4 @@ const CoursesPage = () => {
   );
 };
 
-export default CoursesPage;
+export default StudentsPage;

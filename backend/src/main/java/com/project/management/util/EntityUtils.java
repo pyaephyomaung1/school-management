@@ -20,14 +20,15 @@ public class EntityUtils {
                 .stream()
                 .map(Course::getId)
                 .collect(Collectors.toList());
-
+                
+        String imageUrl = "http://localhost:8080/images/" + student.getStudentImage();
         return new StudentDTO(
                 student.getId(),
                 student.getName(),
                 student.getBirthDate(),
                 student.getGender(),
                 student.getEmail(),
-                student.getStudentImage(),
+                imageUrl,
                 student.getDepartment().getId(),
                 courseIds);
     }
