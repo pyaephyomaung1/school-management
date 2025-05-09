@@ -15,5 +15,4 @@ public class CourseDTO {
     private String description;
     private int departmentId;
     private List<String> studentNames;
-    private List<String> teacherNames;
 }

@@ -2,11 +2,9 @@ package com.project.management.controller;
 
 
 import com.project.management.dto.TeacherDTO;
-import com.project.management.model.Course;
 import com.project.management.model.Department;
 import com.project.management.model.Gender;
 import com.project.management.model.Teacher;
-import com.project.management.repository.CourseRepository;
 import com.project.management.repository.DepartmentRepository;
 import com.project.management.repository.TeacherRepository;
 import com.project.management.service.TeacherService;
@@ -22,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/teachers")
@@ -37,8 +34,6 @@ public class TeacherController {
     @Autowired
     private DepartmentRepository departmentRepository;
 
-    @Autowired
-    private CourseRepository courseRepository;
 
     @Autowired
     private ImageStore imageStore;
@@ -60,7 +55,6 @@ public class TeacherController {
             @RequestParam Gender gender,
             @RequestParam String email,
             @RequestParam int department,
-            @RequestParam List<Integer> courses,
             @RequestPart MultipartFile imageFile) throws IOException {
 
         TeacherDTO dto = new TeacherDTO();
@@ -69,7 +63,6 @@ public class TeacherController {
         dto.setGender(gender);
         dto.setEmail(email);
         dto.setDepartment(department);
-        dto.setCourses(courses);
 
         String imageName = imageStore.saveImage(imageFile); // You need to implement this
         dto.setTeacherImage(imageName);
@@ -85,7 +78,6 @@ public class TeacherController {
         @RequestParam(required = false)String birthdate,
         @RequestParam(required = false)Gender gender,
         @RequestParam(required =false)Integer department,
-        @RequestParam(required = false)List<Integer> courses,
         @RequestPart(value = "image", required = false) MultipartFile imageFile) throws IOException
     {
         Teacher existingTeacher = teacherRepository.findById(id)
@@ -103,13 +95,6 @@ public class TeacherController {
         Department dept = departmentRepository.findById(department)
                 .orElseThrow(() -> new RuntimeException("Department with ID " + department + " not found"));
         existingTeacher.setDepartment(dept);
-    }
-
-    if (courses != null && !courses.isEmpty()) {
-        List<Course> courseEntities = courseRepository.findAll().stream()
-                .filter(c -> courses.contains(c.getId()))
-                .collect(Collectors.toList());
-        existingTeacher.setCourses(courseEntities);
     }
 
     if (imageFile != null && !imageFile.isEmpty()) {

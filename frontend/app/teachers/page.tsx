@@ -153,7 +153,6 @@ const TeacherPage = () => {
                             <th className="p-4 font-semibold">Gender</th>
                             <th className="p-4 font-semibold">Email</th>
                             <th className="p-4 font-semibold">Department</th>
-                            <th className="p-4 font-semibold">Courses</th>
                             <th className="p-4 font-semibold">Actions</th>
                         </tr>
                         </thead>
@@ -185,11 +184,6 @@ const TeacherPage = () => {
                                 <td className="p-4 text-gray-800">{teacher.email || "-"}</td>
                                 <td className="p-4 text-gray-800">
                                     {departmentNames[teacher.department] || "-"}
-                                </td>
-                                <td className="p-4 text-gray-800">
-                                    {teacher.courses?.map((courseId) => (
-                                        <div key={courseId}>{courseNames[courseId] || "-"}</div>
-                                    )) || "-"}
                                 </td>
                                 <td className="p-4">
                                     <div className="flex gap-2">

@@ -46,10 +46,6 @@ public class EntityUtils {
     }
 
     public static TeacherDTO toTeacherDTO(Teacher teacher) {
-        List<Integer> courseIds = safeList(teacher.getCourses())
-                .stream()
-                .map(Course::getId)
-                .collect(Collectors.toList());
         String imageUrl = "http://localhost:8080/images/" + teacher.getTeacherImage();
         return new TeacherDTO(
                 teacher.getId(),
@@ -58,11 +54,10 @@ public class EntityUtils {
                 teacher.getBirthDate(),
                 teacher.getGender(),
                 imageUrl,
-                teacher.getDepartment().getId(),
-                courseIds);
+                teacher.getDepartment().getId());
     }
 
-    public static Teacher toTeacher(TeacherDTO teacher, Department department, List<Course> courses) {
+    public static Teacher toTeacher(TeacherDTO teacher, Department department) {
         return new Teacher(
                 teacher.getId(),
                 teacher.getName(),
@@ -70,8 +65,7 @@ public class EntityUtils {
                 teacher.getBirthDate(),
                 teacher.getTeacherImage(),
                 teacher.getGender(),
-                department,
-                courses);
+                department);
     }
 
     public static CourseDTO toCourseDTO(Course course) {
@@ -80,28 +74,21 @@ public class EntityUtils {
                 .map(Student::getName)
                 .collect(Collectors.toList());
 
-        List<String> teachers = safeList(course.getTeachers())
-                .stream()
-                .map(Teacher::getName)
-                .collect(Collectors.toList());
-
         return new CourseDTO(
                 course.getId(),
                 course.getName(),
                 course.getDescription(),
                 course.getDepartment().getId(),
-                students,
-                teachers);
+                students);
     }
 
-    public static Course toCourse(CourseDTO dto, Department department, List<Student> students, List<Teacher> teachers) {
+    public static Course toCourse(CourseDTO dto, Department department, List<Student> students) {
         Course course = new Course();
         course.setId(dto.getId());
         course.setName(dto.getName());
         course.setDescription(dto.getDescription());
         course.setDepartment(department);
         course.setStudents(students);
-        course.setTeachers(teachers);
         return course;
     }
 

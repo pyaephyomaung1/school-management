@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.management.dto.TeacherDTO;
-import com.project.management.model.Course;
 import com.project.management.model.Department;
 import com.project.management.model.Teacher;
-import com.project.management.repository.CourseRepository;
 import com.project.management.repository.DepartmentRepository;
 import com.project.management.repository.TeacherRepository;
 import com.project.management.util.EntityUtils;
@@ -24,16 +22,13 @@ public class TeacherServiceImpl implements TeacherService {
     @Autowired
     private DepartmentRepository departmentRepository;
 
-    @Autowired
-    private CourseRepository courseRepository;
 
     @Override
     public TeacherDTO create(TeacherDTO teacherDTO) {
         Department department = departmentRepository.findById(teacherDTO.getDepartment())
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
-        List<Course> courses = courseRepository.findAllById(teacherDTO.getCourses());
-        Teacher teacher = EntityUtils.toTeacher(teacherDTO, department, courses);
+        Teacher teacher = EntityUtils.toTeacher(teacherDTO, department);
         return EntityUtils.toTeacherDTO(teacherRepository.save(teacher));
     }
 
@@ -45,14 +40,13 @@ public class TeacherServiceImpl implements TeacherService {
         Department department = departmentRepository.findById(teacherDTO.getDepartment())
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
-        List<Course> courses = courseRepository.findAllById(teacherDTO.getCourses());
 
         existingTeacher.setName(teacherDTO.getName());
         existingTeacher.setEmail(teacherDTO.getEmail());
         existingTeacher.setBirthDate(teacherDTO.getBirthDate());
         existingTeacher.setGender(teacherDTO.getGender());
         existingTeacher.setDepartment(department);
-        existingTeacher.setCourses(courses);
+
 
         if (teacherDTO.getTeacherImage() != null && !teacherDTO.getTeacherImage().isBlank()) {
             existingTeacher.setTeacherImage(teacherDTO.getTeacherImage());

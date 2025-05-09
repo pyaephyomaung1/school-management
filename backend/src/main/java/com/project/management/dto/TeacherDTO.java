@@ -1,7 +1,6 @@
 package com.project.management.dto;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.project.management.model.Gender;
 
@@ -20,5 +19,4 @@ public class TeacherDTO {
     private Gender gender;
     private String teacherImage;
     private int department;
-    private List<Integer> courses;
 }

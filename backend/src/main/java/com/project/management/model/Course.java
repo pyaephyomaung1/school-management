@@ -32,9 +32,6 @@ public class Course {
     @ManyToMany(mappedBy = "courses")
     private List<Student> students;
 
-    @ManyToMany(mappedBy = "courses")
-    private List<Teacher> teachers;
-
     @ManyToOne
     @JoinColumn( name = "department_id" )
     private Department department;
